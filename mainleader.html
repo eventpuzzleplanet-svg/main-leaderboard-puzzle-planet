@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2025 - 2026 Leaderboard</title>
+  <meta name="theme-color" content="#ffffff" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      text-align: center;
+      transition: background 0.4s, color 0.4s;
+    }
+
+    body.light-mode {
+      background: url('light_bg.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #000;
+    }
+    body.dark-mode {
+      background: url('dark_bg.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+
+    .theme-toggle-switch {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .theme-toggle-icon {
+      font-size: 18px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      background-color: #ccc;
+      border-radius: 24px;
+      top: 0; left: 0; right: 0; bottom: 0;
+      transition: 0.4s;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.4s;
+    }
+    .switch input:checked + .slider {
+      background-color: #4caf50;
+    }
+    .switch input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .top-left-logo {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      height: 50px;
+      object-fit: contain;
+      z-index: 100;
+      transition: height 0.3s;
+    }
+    @media (max-width: 600px) {
+      .top-left-logo {
+        height: 32px;
+      }
+    }
+
+    .top-center-logo {
+      margin: 20px auto 10px;
+      width: 100%;
+      max-width: 90%;
+      padding: 0 10px;
+    }
+    .top-center-logo img {
+      width: 100%;
+      height: auto;
+      max-width: 300px;
+      object-fit: contain;
+    }
+
+    .glow-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2em;
+      margin: 15px auto;
+      padding: 12px 20px;
+      border: 2px solid #ffd700;
+      border-radius: 12px;
+      display: inline-block;
+      background: linear-gradient(145deg, #f9f9f9, #eee);
+      box-shadow: 0 0 10px #ffce00, 0 0 15px #ffdc73 inset;
+      transition: background 0.4s, box-shadow 0.4s, color 0.4s;
+      white-space: nowrap;
+      color: #000;
+    }
+    body.dark-mode .glow-title {
+      background: linear-gradient(145deg, #333, #222);
+      box-shadow: 0 0 10px #999, 0 0 15px #666 inset;
+      color: #fff;
+    }
+    @media (max-width: 480px) {
+      .glow-title {
+        white-space: normal;
+        line-height: 1.2;
+      }
+    }
+
+    .last-update {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+    }
+    body.light-mode .last-update {
+      color: #555;
+    }
+    body.dark-mode .last-update {
+      color: #ccc;
+    }
+
+    .search-box {
+      margin: 0 auto 20px;
+      width: 100%;
+      max-width: 400px;
+      padding: 0 15px;
+    }
+    #searchInput {
+      width: 100%;
+      padding: 10px 16px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: 1px solid #999;
+      background: #fff;
+      color: #000;
+      transition: background 0.4s, color 0.4s, border 0.4s;
+    }
+    body.dark-mode #searchInput {
+      background: #222;
+      color: #fff;
+      border: 1px solid #666;
+    }
+
+    .leaderboard {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px 20px;
+      background: rgba(255,255,255,0.96);
+      border-radius: 16px;
+      box-sizing: border-box;
+      color: #000;
+      transition: background 0.4s, color 0.4s;
+    }
+    body.dark-mode .leaderboard {
+      background: rgba(28,28,28,0.95);
+      color: #fff;
+    }
+
+    .table-wrap {
+      max-height: 60vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(135deg, #e1e1e1, #cccccc);
+      color: #333;
+      text-transform: uppercase;
+      font-size: 13px;
+      font-family: 'Poppins', sans-serif;
+      border-bottom: 2px solid #bbb;
+      z-index: 100; /* ensure header stays above rows */
+    }
+    body.dark-mode thead th {
+      background: linear-gradient(135deg, #444, #333);
+      color: #fff;
+      border-bottom: 2px solid #666;
+    }
+
+    thead th, tbody td {
+      padding: 14px;
+      font-size: 14px;
+      text-align: center;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .rank-cell {
+      position: relative;
+    }
+    .rank-cell .trophy {
+      position: absolute;
+      left: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+    }
+
+    .gold-row { background-color: #ffe680; }
+    .silver-row { background-color: #e0e0e0; }
+    .bronze-row { background-color: #f5cbaa; }
+    .top10-row { background-color: #f7f7f7; }
+
+    body.dark-mode .gold-row { background-color: #4d3b00; }
+    body.dark-mode .silver-row { background-color: #666; }
+    body.dark-mode .bronze-row { background-color: #8b5a2b; }
+    body.dark-mode .top10-row { background-color: #2b2b2b; }
+
+    .gold-row .trophy { color: #ffd700; }
+    .silver-row .trophy { color: #c0c0c0; }
+    .bronze-row .trophy { color: #cd7f32; }
+
+    .footer {
+      margin-top: auto;
+      padding: 20px 0;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9em;
+      color: #555;
+    }
+    body.dark-mode .footer {
+      color: #999;
+    }
+
+    @media (max-width: 600px) {
+      .glow-title {
+        font-size: 1.5em;
+        padding: 10px 20px;
+      }
+      thead th, tbody td {
+        padding: 10px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body class="light-mode">
+  <div class="theme-toggle-switch">
+    <span id="theme-icon" class="theme-toggle-icon">☀️</span>
+    <label class="switch">
+      <input type="checkbox" id="themeToggle" onchange="toggleTheme()" />
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <img src="logo.png" alt="Logo" class="top-left-logo" />
+
+  <div class="top-center-logo">
+    <img src="pp_logo.png" alt="PP Logo" />
+  </div>
+
+  <div class="glow-title">2025‑2026 Leaderboard</div>
+
+  <div class="last-update" id="lastUpdateText">Last Update: —</div>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search name..." oninput="filterRows()" />
+  </div>
+
+  <div class="leaderboard">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Total<br>Scores</th>
+            <th>Participated</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardTableBody">
+          <!-- JS fills rows -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">Powered by : Puzzle Planet</div>
+
+  <script>
+    function formatDateToDdMmmYyyy(isoDate) {
+      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const d = new Date(isoDate);
+      return `${String(d.getDate()).padStart(2,'0')}-${months[d.getMonth()]}-${d.getFullYear()}`;
+    }
+
+    async function loadLeaderboard() {
+      const csvText = await fetch('total.csv', { cache: 'no-store' }).then(r => r.text());
+      const lines = csvText.trim().split(/\r?\n/);
+      const datePart = lines[0].replace(/Last Update:\s*/i, '').trim();
+      document.getElementById('lastUpdateText').textContent = 'Last Update: ' + formatDateToDdMmmYyyy(datePart);
+
+      const dataLines = lines.slice(2);
+      const data = dataLines.map(line => {
+        const [id, name, score, participated] = line.split(',').map(s => s.trim());
+        return { id, name, score: parseInt(score) || 0, participated };
+      }).sort((a, b) => b.score - a.score);
+
+      const tbody = document.getElementById("leaderboardTableBody");
+      tbody.innerHTML = '';
+      data.forEach((d, i) => {
+        const tr = document.createElement('tr');
+        if (i === 0) tr.classList.add('gold-row');
+        else if (i === 1) tr.classList.add('silver-row');
+        else if (i === 2) tr.classList.add('bronze-row');
+        else if (i < 10) tr.classList.add('top10-row');
+
+        const trophy = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+        tr.innerHTML = `
+          <td><div class="rank-cell">${trophy ? `<span class="trophy">${trophy}</span>` : ''}<span>${i+1}</span></div></td>
+          <td>${d.name}</td>
+          <td>${d.score}</td>
+          <td>${d.participated}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterRows() {
+      const val = document.getElementById('searchInput').value.toLowerCase();
+      document.querySelectorAll('#leaderboardTableBody tr').forEach(row => {
+        const nameText = row.children[1].textContent.toLowerCase();
+        row.style.display = nameText.includes(val) ? '' : 'none';
+      });
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const isLight = body.classList.contains('light-mode');
+      if (isLight) {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        document.getElementById('theme-icon').textContent = '🌙';
+        document.getElementById('themeToggle').checked = true;
+      } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        document.getElementById('theme-icon').textContent = '☀️';
+        document.getElementById('themeToggle').checked = false;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.body.classList.add('light-mode');
+      document.getElementById('theme-icon').textContent = '☀️';
+      document.getElementById('themeToggle').checked = false;
+      loadLeaderboard();
+    });
+  </script>
+</body>
+</html>
